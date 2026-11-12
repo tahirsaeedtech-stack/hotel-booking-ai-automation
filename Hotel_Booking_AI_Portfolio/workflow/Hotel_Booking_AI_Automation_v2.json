@@ -1,0 +1,450 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -624,
+        -32
+      ],
+      "id": "bf36bb70-f6ad-484e-86ae-790a1eb2aa8a",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "models/gemini-3-flash-preview",
+          "cachedResultName": "Gemini 3 Flash Preview",
+          "cachedResultUrl": ""
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ `Analyze this hotel booking:\n\nCustomer: ${$json.customer_name}\nHotel: ${$json.hotel}\nBooking Amount: ${$json.booking_amount}\nBooking Status: ${$json.booking_status}\n\nReturn ONLY a valid JSON object with these fields:\ncustomer_name, hotel, booking_amount, booking_status, priority, recommended_action.\n\nBusiness rules:\n- Amount greater than 200: High priority.\n- Amount of 200 or less: Standard priority.\n- Preserve the original booking information.\n- Recommend one operational action.\n- Do not invent missing information.\n- Do not include Markdown code fences or explanations.` }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        -176,
+        0
+      ],
+      "id": "8f5644f5-1b2a-4a46-84c2-a94fcd58ab54",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "MvgbGjHWqKGJEdlT",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bba9a023-4233-424f-9444-d25604e71102",
+              "name": "=booking",
+              "value": "={{ JSON.parse($json.content.parts[0].text) }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        96,
+        0
+      ],
+      "id": "7a44c1e0-fb52-4dd3-a753-75b79e008f45",
+      "name": "Parse AI Response"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "7c924b6c-6fee-4547-8850-e33564fe09e9",
+              "leftValue": "={{ $json.booking.booking_amount > 200\n  ? $json.booking.priority === \"High\"\n  : $json.booking.priority === \"Standard\" }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        240,
+        0
+      ],
+      "id": "e8e607ec-f004-49de-ae0c-b37cc5747e7e",
+      "name": "Validate AI Priority"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2ae6e0be-9032-4143-9411-bd0596039705",
+              "name": "=customer_name",
+              "value": "={{ $json.booking.customer_name }}",
+              "type": "string"
+            },
+            {
+              "id": "fa2c7ac3-a27f-4591-a290-a5e090b239c4",
+              "name": "=hotel",
+              "value": "={{ $json.booking.hotel }}",
+              "type": "string"
+            },
+            {
+              "id": "1a072489-de6d-4052-9425-b678d4391530",
+              "name": "booking_amount",
+              "value": "={{ $json.booking.booking_amount }}",
+              "type": "number"
+            },
+            {
+              "id": "15b3185f-01d3-4376-9451-14779c23c3c4",
+              "name": "=priority",
+              "value": "={{ $json.booking.priority }}",
+              "type": "string"
+            },
+            {
+              "id": "013fd5b2-ebf6-4acf-beae-b19cc6d1f9b4",
+              "name": "processing_status",
+              "value": "Approved",
+              "type": "string"
+            },
+            {
+              "id": "b6e68679-294e-472e-8846-b1437fe73b2c",
+              "name": "=recommended_action",
+              "value": "={{ $json.booking.recommended_action }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        416,
+        -96
+      ],
+      "id": "a9243849-f2ed-4700-91cf-c265e9b9fe46",
+      "name": "Approved Booking"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bded51b9-94f9-4ec0-912b-1e0b20ff55be",
+              "name": "=customer_name",
+              "value": "={{ $json.booking.customer_name }}",
+              "type": "string"
+            },
+            {
+              "id": "fb4b5ed8-6ec1-444b-9f69-1281b4fa61c4",
+              "name": "=booking_amount",
+              "value": "={{ $json.booking.booking_amount }}",
+              "type": "number"
+            },
+            {
+              "id": "95da035b-0627-489d-b782-e9fdf42eb5fc",
+              "name": "=ai_priority",
+              "value": "={{ $json.booking.priority }}",
+              "type": "string"
+            },
+            {
+              "id": "de234c2a-95ae-40e0-973a-ede38b37635f",
+              "name": "review_status",
+              "value": "Needs Human Review",
+              "type": "string"
+            },
+            {
+              "id": "9d21fbd4-7a4d-4612-b332-385cf8ba6d4c",
+              "name": "review_reason",
+              "value": "AI priority does not match booking amount",
+              "type": "string"
+            },
+            {
+              "id": "0d27ebdc-a336-4485-95d1-cad10e740497",
+              "name": "recommended_action",
+              "value": "Verify booking details before processing",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        416,
+        96
+      ],
+      "id": "615af497-edb3-40a3-9d7d-658d0a7d6e4c",
+      "name": "Review Queue"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3c91e835-57c8-4ce5-a3d7-4310aad15e4f",
+              "name": "=bookings",
+              "value": "={{ [\n  {\n    \"customer_name\": \"Ahmed\",\n    \"hotel\": \"City Hotel\",\n    \"booking_amount\": 250,\n    \"booking_status\": \"Confirmed\"\n  },\n  {\n    \"customer_name\": \"Sara\",\n    \"hotel\": \"Resort Hotel\",\n    \"booking_amount\": 200,\n    \"booking_status\": \"Confirmed\"\n  },\n  {\n    \"customer_name\": \"Ali\",\n    \"hotel\": \"City Hotel\",\n    \"booking_amount\": null,\n    \"booking_status\": \"Pending\"\n  },\n  {\n    \"customer_name\": \"Fatima\",\n    \"hotel\": \"Resort Hotel\",\n    \"booking_amount\": -50,\n    \"booking_status\": \"Confirmed\"\n  },\n  {\n    \"customer_name\": \"Zain\",\n    \"hotel\": \"City Hotel\",\n    \"booking_amount\": 350,\n    \"booking_status\": \"Confirmed\"\n  }\n] }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -480,
+        -32
+      ],
+      "id": "b2d535f3-947e-4b65-a530-f4989237e686",
+      "name": "Booking Data"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "bookings",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1.1,
+      "position": [
+        -496,
+        192
+      ],
+      "id": "8c0eab4d-5165-4761-aa98-f79ab603e0c3",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "23594129-592a-4a6c-8a28-dd57de9ae607",
+              "leftValue": "={{ typeof $json.booking_amount === 'number'\n   && Number.isFinite($json.booking_amount)\n   && $json.booking_amount > 0\n   && typeof $json.customer_name === 'string'\n   && $json.customer_name.trim().length > 0\n   && typeof $json.hotel === 'string'\n   && $json.hotel.trim().length > 0\n   && ['Confirmed', 'Pending', 'Cancelled'].includes($json.booking_status)\n}}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        -352,
+        192
+      ],
+      "id": "0542cffc-c335-4e4b-b29e-d3461e8edee4",
+      "name": "Validate Booking Input"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d68db9a0-e3a6-4604-9dc4-115793df6164",
+              "name": "=customer_name",
+              "value": "={{ $json.customer_name }}",
+              "type": "string"
+            },
+            {
+              "id": "55976000-f806-416a-acef-f54ab8c19a5b",
+              "name": "=hotel",
+              "value": "={{ $json.hotel }}",
+              "type": "string"
+            },
+            {
+              "id": "dd646226-2699-4090-987d-3b1ce05aaf52",
+              "name": "=booking_amount",
+              "value": "={{ $json.booking_amount }}",
+              "type": "number"
+            },
+            {
+              "id": "8ded370a-15d2-416c-87f5-e11720e684c2",
+              "name": "=booking_status",
+              "value": "={{ $json.booking_status }}",
+              "type": "string"
+            },
+            {
+              "id": "c38327e7-a6c4-4f6d-bbfd-f5f8e10a74d9",
+              "name": "review_status",
+              "value": "Needs Human Review",
+              "type": "string"
+            },
+            {
+              "id": "98b0f006-49e6-4e85-b54c-c169ddd5e59a",
+              "name": "=review_reason",
+              "value": "={{ $json.booking_amount === null || $json.booking_amount === undefined\n  ? \"Missing booking amount\"\n  : typeof $json.booking_amount !== \"number\" || !Number.isFinite($json.booking_amount) || $json.booking_amount <= 0\n    ? \"Invalid booking amount\"\n    : \"Invalid or missing booking details\" }}",
+              "type": "string"
+            },
+            {
+              "id": "cb8d318e-af00-4987-93c4-77bd673fe8dd",
+              "name": "recommended_action",
+              "value": "Verify and correct booking information before processing",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -128,
+        288
+      ],
+      "id": "5f7ffbbf-d43e-4489-97ad-bae226353906",
+      "name": "Invalid Booking Review"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Booking Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Parse AI Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI Response": {
+      "main": [
+        [
+          {
+            "node": "Validate AI Priority",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate AI Priority": {
+      "main": [
+        [
+          {
+            "node": "Approved Booking",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Review Queue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Booking Data": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Validate Booking Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Booking Input": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Invalid Booking Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "f33c55b1-d688-4dd4-9acc-dccf149a1b26",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "be4239576b3c9d9c22427e052ce5ce56a81b5a688b2f787f48e81e435cf18e5f"
+  },
+  "nodeGroups": [],
+  "id": "fCn5KaRxxwKZ5ANL",
+  "tags": []
+}
