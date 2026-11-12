@@ -1,54 +1,22 @@
-# AI-Powered Hotel Booking Automation
+## Project Files
 
-## Project Overview
+- **Latest workflow (v2):** [Download n8n Workflow v2](Hotel_Booking_AI_Portfolio/workflow/Hotel_Booking_AI_Automation_v2.json)
+- **Previous workflow (v1):** [View Version 1](Hotel_Booking_AI_Portfolio/workflow/Hotel_Booking_AI_Automation_v1.json)
+- **Workflow screenshots:** [View Screenshots](Hotel_Booking_AI_Portfolio/screenshots/)
+- **Project documentation:** [View Documentation](Hotel_Booking_AI_Portfolio/documentation/README.md)
 
-A no-code hotel booking automation prototype developed using **n8n Cloud and Google Gemini AI**.
+## Latest Version — v2
 
-The system validates booking information, analyzes valid bookings, classifies priorities, and routes problematic records for human review.
+Version 2 includes corrections to the booking splitting configuration and invalid booking review status.
 
-## Technology Stack
-
-- n8n Cloud
-- Google Gemini API
-- JSON
-- Rule-based validation
-
-## Automation Workflow
-
-1. Receive sample hotel bookings.
-2. Split bookings into individual records.
-3. Validate booking input data.
-4. Send valid bookings to Gemini AI.
-5. Parse structured AI responses.
-6. Verify AI priority against business rules.
-7. Route approved records and exceptions to separate processing paths.
-
-## Key Features
-
-- Multiple booking processing
-- Input validation
-- AI-powered priority classification
-- Structured JSON parsing
-- AI decision verification
-- Human-review routing
-
-## Test Results
+### Tested Results
 
 | Metric | Result |
 |---|---|
-| Total bookings | 5 |
+| Total sample bookings | 5 |
 | Approved for processing | 3 |
-| Invalid input review | 2 |
-| AI priority review | 0 |
-| End-to-end execution | Successful |
+| Invalid input reviews | 2 |
+| AI priority reviews | 0 |
+| End-to-end n8n execution | Successful |
 
-## Current Limitations
-
-This prototype uses sample booking data. It does not yet connect to a live hotel booking platform, send customer notifications, or save records to a database.
-
-Additional error handling and production testing are required before real-world deployment.
-
-## Project Files
-
-- **Workflow:** `workflow/Hotel_Booking_AI_Automation_v1.json`
-- **Screenshots:** `screenshots/`
+**Note:** This project is a tested prototype using sample data. It does not create live hotel reservations or communicate with real customers.
